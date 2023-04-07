@@ -1,7 +1,7 @@
 # HIVE
 
 ### [HIVE: Harnessing Human Feedback for Instructional Visual Editing](https://arxiv.org/pdf/2212.09877.pdf)
-Shu Zhang, Xinyi Yang, Yihao Feng, Can Qin, Chia-Chih Chen, Ning Yu, Zeyuan Chen, Huan Wang, Silvio Savarese, Stefano Ermon, Caiming Xiong, and Ran Xu<br>
+Shu Zhang \*, Xinyi Yang \*, Yihao Feng \*, Can Qin, Chia-Chih Chen, Ning Yu, Zeyuan Chen, Huan Wang, Silvio Savarese, Stefano Ermon, Caiming Xiong, and Ran Xu<br>
 arXiv 2023
 
 ### [paper](https://arxiv.org/pdf/2212.09877.pdf) | [project page](https://shugerdou.github.io/hive/)
