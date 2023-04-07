@@ -1,6 +1,6 @@
-# HIVE Finetuning
+# HIVE
 
-This is a PyTorch implementation of [HIVE](https://arxiv.org/pdf/2303.09618.pdf) finetuning. The major part of the code follows [InstructPix2Pix](https://github.com/timothybrooks/instruct-pix2pix). In this repo, we have implemented both [stable diffusion v1.5-base](https://huggingface.co/runwayml/stable-diffusion-v1-5) and [stable diffusion v2.1-base](https://huggingface.co/stabilityai/stable-diffusion-2-1-base) as the backbone.
+This is a PyTorch implementation of [HIVE: Harnessing Human Feedback for Instructional Visual Editing](https://arxiv.org/pdf/2303.09618.pdf). The major part of the code follows [InstructPix2Pix](https://github.com/timothybrooks/instruct-pix2pix). In this repo, we have implemented both [stable diffusion v1.5-base](https://huggingface.co/runwayml/stable-diffusion-v1-5) and [stable diffusion v2.1-base](https://huggingface.co/stabilityai/stable-diffusion-2-1-base) as the backbone.
 
 
 
@@ -19,20 +19,8 @@ To fine-tune a stable diffusion model, you need to obtain the pre-trained stable
 
 
 
-### Training
-Training can be done by running the following command by using 16 NVIDIA A100 GPU. 
-
-
-For ```stable diffusion v2.1-base```, please run
-
-```
-python main.py --name sdv21_base --base configs/train_v21_base.yaml --train --gpus 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-
-```
-
-
 ### Inference
-After training, samples can be obtained by running the command. 
+Samples can be obtained by running the command. 
 
 For SD v2.1, if we use the conditional reward, we run
 
@@ -40,13 +28,6 @@ For SD v2.1, if we use the conditional reward, we run
 python edit_cli_rw_label.py --steps 100 --resolution 512 --seed 100 --cfg-text 7.5 --cfg-image 1.5 --input imgs/example1.jpg --output imgs/output.jpg --edit "move it to Mars" --ckpt checkpoints/hive_v2_rw_condition.ckpt --config configs/generate_v21_base.yaml
 ```
 
-```
-python edit_cli_rw_label.py --steps 100 --resolution 512 --seed 100 --cfg-text 7.5 --cfg-image 1.5 --input imgs/example2.jpg --output imgs/output.jpg --edit "replace the river with lawn" --ckpt checkpoints/hive_v2_rw_condition.ckpt --config configs/generate_v21_base.yaml
-```
-
-```
-python edit_cli_rw_label.py --steps 100 --resolution 512 --seed 100 --cfg-text 7.5 --cfg-image 1.5 --input imgs/example3.jpg --output imgs/output.jpg --edit "make pyramids in the sea" --ckpt checkpoints/hive_v2_rw_condition.ckpt --config configs/generate_v21_base.yaml
-```
 
 or run batch inference on our inference data:
 
