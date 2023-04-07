@@ -1,8 +1,8 @@
 # HIVE
 
 ### [HIVE: Harnessing Human Feedback for Instructional Visual Editing](https://arxiv.org/pdf/2212.09877.pdf)
-Shu Zhang\*<sup>1</sup>, Xinyi Yang\*1, Yihao Feng\*1, Can Qin\3, Chia-Chih Chen\1, Ning Yu\1, Zeyuan Chen\1, Huan Wang\1, Silvio Savarese\1,2, Stefano Ermon\2, Caiming Xiong\1, and Ran Xu\1<br>
-\1Salesforce AI, \2Stanford University, \3Northeastern University<br>
+Shu Zhang\*<sup>1</sup>, Xinyi Yang\*<sup>1</sup>, Yihao Feng\*<sup>1</sup>, Can Qin<sup>3</sup>, Chia-Chih Chen<sup>1</sup>, Ning Yu<sup>1</sup>, Zeyuan Chen<sup>1</sup>, Huan Wang<sup>1</sup>, Silvio Savarese<sup>1,2</sup>, Stefano Ermon<sup>2</sup>, Caiming Xiong<sup>1</sup>, and Ran Xu<sup>1</sup><br>
+<sup>1</sup>Salesforce AI, <sup>2</sup>Stanford University, <sup>3</sup>Northeastern University<br>
  \*denotes equal contribution
 arXiv 2023
 
