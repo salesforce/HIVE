@@ -1,12 +1,12 @@
 # HIVE
 
-### [HIVE: Harnessing Human Feedback for Instructional Visual Editing](https://arxiv.org/pdf/2212.09877.pdf)
+### [HIVE: Harnessing Human Feedback for Instructional Visual Editing](https://arxiv.org/pdf/2303.09618.pdf)
 Shu Zhang\*<sup>1</sup>, Xinyi Yang\*<sup>1</sup>, Yihao Feng\*<sup>1</sup>, Can Qin<sup>3</sup>, Chia-Chih Chen<sup>1</sup>, Ning Yu<sup>1</sup>, Zeyuan Chen<sup>1</sup>, Huan Wang<sup>1</sup>, Silvio Savarese<sup>1,2</sup>, Stefano Ermon<sup>2</sup>, Caiming Xiong<sup>1</sup>, and Ran Xu<sup>1</sup><br>
 <sup>1</sup>Salesforce AI, <sup>2</sup>Stanford University, <sup>3</sup>Northeastern University<br>
- \*denotes equal contribution
+ \*denotes equal contribution<br>
 arXiv 2023
 
-### [paper](https://arxiv.org/pdf/2212.09877.pdf) | [project page](https://shugerdou.github.io/hive/)
+### [paper](https://arxiv.org/pdf/2303.09618.pdf) | [project page](https://shugerdou.github.io/hive/)
 
 <img src='imgs/results.png' width=700></pre>
 
@@ -83,5 +83,15 @@ or run batch inference on our inference data:
 ```
 python edit_cli_batch.py --steps 100 --resolution 512 --seed 100 --cfg-text 7.5 --cfg-image 1.5 --jsonl_file data/test.jsonl --output_dir imgs/sdv15/ --ckpt checkpoints/hive_rw.ckpt --config configs/generate.yaml
 ```
+
+## Citation
+  ```
+  @article{zhang2023hive,
+  	title={HIVE: Harnessing Human Feedback for Instructional Visual Editing},
+  	author={Zhang, Shu and Yang, Xinyi and Feng, Yihao and Qin, Can and Chen, Chia-Chih and Yu, Ning and Chen, Zeyuan and Wang, Huan and Savarese, Silvio and Ermon, Stefano and Xiong, Caiming and Xu, Ran},
+  	journal={arXiv preprint arXiv:2303.09618},
+  	year={2023}
+	}
+  ```
 
 
