@@ -36,7 +36,9 @@ Samples can be obtained by running the command.
 For SD v2.1, if we use the conditional reward, we run
 
 ```
-python edit_cli_rw_label.py --steps 100 --resolution 512 --seed 100 --cfg-text 7.5 --cfg-image 1.5 --input imgs/example1.jpg --output imgs/output.jpg --edit "move it to Mars" --ckpt checkpoints/hive_v2_rw_condition.ckpt --config configs/generate_v21_base.yaml
+python edit_cli_rw_label.py --steps 100 --resolution 512 --seed 100 --cfg-text 7.5 --cfg-image 1.5 \
+--input imgs/example1.jpg --output imgs/output.jpg --edit "move it to Mars" --ckpt checkpoints/hive_v2_rw_condition.ckpt\
+--config configs/generate_v21_base.yaml
 ```
 
 
