@@ -47,7 +47,7 @@ or run batch inference on our inference data:
 ```
 python edit_cli_batch_rw_label.py --steps 100 --resolution 512 --seed 100 --cfg-text 7.5 --cfg-image 1.5 \
 --jsonl_file data/test.jsonl --output_dir imgs/sdv21_rw_label/ --ckpt checkpoints/hive_v2_rw_condition.ckpt \
---config configs/generate_v21_base.yaml
+--config configs/generate_v21_base.yaml --image_dir data/evaluation/
 ```
 
 For SD v2.1, if we use the weighted reward, we can run
@@ -64,7 +64,7 @@ or run batch inference on our inference data:
 ```
 python edit_cli_batch.py --steps 100 --resolution 512 --seed 100 --cfg-text 7.5 --cfg-image 1.5 \
 --jsonl_file data/test.jsonl --output_dir imgs/sdv21/ --ckpt checkpoints/hive_v2_rw.ckpt \
---config configs/generate_v21_base.yaml
+--config configs/generate_v21_base.yaml --image_dir data/evaluation/
 ```
 
 For SD v1.5, if we use the conditional reward, we can run
@@ -80,7 +80,8 @@ or run batch inference on our inference data:
 ```
 python edit_cli_batch_rw_label.py --steps 100 --resolution 512 --seed 100 --cfg-text 7.5 --cfg-image 1.5 \
 --jsonl_file data/test.jsonl --output_dir imgs/sdv15_rw_label/ \
---ckpt checkpoints/hive_rw_condition.ckpt --config configs/generate.yaml
+--ckpt checkpoints/hive_rw_condition.ckpt --config configs/generate.yaml \
+--image_dir data/evaluation/
 ```
 
 For SD v1.5, if we use the weighted reward, we run
@@ -97,7 +98,8 @@ or run batch inference on our inference data:
 ```
 python edit_cli_batch.py --steps 100 --resolution 512 --seed 100 --cfg-text 7.5 --cfg-image 1.5 \
 --jsonl_file data/test.jsonl --output_dir imgs/sdv15/ \
---ckpt checkpoints/hive_rw.ckpt --config configs/generate.yaml
+--ckpt checkpoints/hive_rw.ckpt --config configs/generate.yaml \
+--image_dir data/evaluation/
 ```
 
 ## Citation
