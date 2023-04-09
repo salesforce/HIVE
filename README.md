@@ -24,11 +24,18 @@ First set-up the ```hive``` enviroment and download the pretrianed model as belo
 conda env create -f environment.yaml
 conda activate hive
 bash scripts/download_checkpoints.sh
-bash scripts/download_hive_data.sh
 ```
 
 To fine-tune a stable diffusion model, you need to obtain the pre-trained stable diffusion models following their [instructions](https://github.com/runwayml/stable-diffusion). If you use SD-V1.5, you can download the huggingface weights [HuggingFace SD 1.5](https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.ckpt). If you use SD-V2.1, the weights can be downloaded on [HuggingFace SD 2.1](https://huggingface.co/stabilityai/stable-diffusion-2-1-base). You can decide which version of checkpoint to use. We use ```v2-1_512-ema-pruned.ckpt```. Download the model to checkpoints/.
 
+
+### Data
+We suggest to install Gcloud CLI following [Gcloud download](https://cloud.google.com/sdk/docs/install). Then run
+```
+bash scripts/download_hive_data.sh
+```
+
+An alternative method is to directly download the data through [Evaluation data](https://storage.cloud.google.com/sfr-hive-data-research/data/evaluation.zip) and [Evaluation instructions](https://storage.cloud.google.com/sfr-hive-data-research/data/test.jsonl).
 
 
 ### Inference
