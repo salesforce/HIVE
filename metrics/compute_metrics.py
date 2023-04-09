@@ -208,7 +208,7 @@ def main():
     parser.add_argument("--steps", default=100, type=int)
     parser.add_argument("--config", default="configs/generate.yaml", type=str)
     parser.add_argument("--output_path", default="analysis/", type=str)
-    parser.add_argument("--ckpt", default="checkpoints/instruct-pix2pix-00-22000.ckpt", type=str)
+    parser.add_argument("--ckpt", default="checkpoints/hive_v2_rw_condition.ckpt", type=str)
     parser.add_argument("--dataset", default="data/clip-filtered-dataset/", type=str)
     parser.add_argument("--vae-ckpt", default=None, type=str)
     args = parser.parse_args()
