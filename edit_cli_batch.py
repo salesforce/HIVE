@@ -88,6 +88,8 @@ def main():
 
     seed = random.randint(0, 100000) if args.seed is None else args.seed
     output_dir = args.output_dir
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
     image_dir = args.image_dir
     instructions = []
     image_paths = []

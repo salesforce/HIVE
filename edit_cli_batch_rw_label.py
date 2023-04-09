@@ -73,6 +73,7 @@ def main():
     parser.add_argument("--vae-ckpt", default=None, type=str)
     parser.add_argument("--output_dir", required=True, type=str)
     parser.add_argument("--jsonl_file", required=True, type=str)
+    parser.add_argument("--image_dir", required=True, default="data/evaluation/", type=str)
     parser.add_argument("--cfg-text", default=7.5, type=float)
     parser.add_argument("--cfg-image", default=1.5, type=float)
     parser.add_argument("--seed", default=100, type=int)
@@ -87,12 +88,15 @@ def main():
 
     seed = random.randint(0, 100000) if args.seed is None else args.seed
     output_dir = args.output_dir
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    image_dir = args.image_dir
     instructions = []
     image_paths = []
     with jsonlines.open(args.jsonl_file) as reader:
         for ll in reader:
             instructions.append(ll["instruction"])
-            image_paths.append(ll['source_img'])
+            image_paths.append(os.path.join(image_dir, ll['source_img']))
 
     for i, instruction in enumerate(instructions):
         output_image = os.path.join(output_dir, f'instruct_{i}.png')
