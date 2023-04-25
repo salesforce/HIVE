@@ -1,5 +1,14 @@
-from __future__ import annotations
+'''
+ * Copyright (c) 2023 Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: Apache License 2.0
+ * For full license text, see LICENSE.txt file in the repo root or http://www.apache.org/licenses/
+ * By Shu Zhang
+ * Modified from InstructPix2Pix repo: https://github.com/timothybrooks/instruct-pix2pix
+ * Copyright (c) 2023 Timothy Brooks, Aleksander Holynski, Alexei A. Efros.  All rights reserved.
+'''
 
+from __future__ import annotations
 import json
 import math
 from pathlib import Path
@@ -11,12 +20,14 @@ import torchvision
 from einops import rearrange
 from PIL import Image
 from torch.utils.data import Dataset
+import jsonlines
 
 
 class EditDataset(Dataset):
     def __init__(
         self,
-        path: str,
+        path_official: str,
+        path_ours: str,
         split: str = "train",
         splits: tuple[float, float, float] = (0.9, 0.05, 0.05),
         min_resize_res: int = 256,
@@ -26,15 +37,15 @@ class EditDataset(Dataset):
     ):
         assert split in ("train", "val", "test")
         assert sum(splits) == 1
-        self.path = path
+        self.path_official = path_official
+        self.path_ours = path_ours
         self.min_resize_res = min_resize_res
         self.max_resize_res = max_resize_res
         self.crop_res = crop_res
         self.flip_prob = flip_prob
-
-        with open(Path(self.path, "seeds.json")) as f:
+        # load official dataset
+        with open(Path(self.path_official, "seeds.json")) as f:
             self.seeds = json.load(f)
-
         split_0, split_1 = {
             "train": (0.0, splits[0]),
             "val": (splits[0], splits[0] + splits[1]),
@@ -45,18 +56,37 @@ class EditDataset(Dataset):
         idx_1 = math.floor(split_1 * len(self.seeds))
         self.seeds = self.seeds[idx_0:idx_1]
 
+        # load in-house dataset
+        self.instructions = []
+        self.source_imgs = []
+        self.edited_imgs = []
+        cnt = 0
+        with jsonlines.open(Path(self.path_ours, "training_1M.jsonl")) as reader:
+            for ll in reader:
+                self.instructions.append(ll['instruction'])
+                self.source_imgs.append(ll['source_img'])
+                self.edited_imgs.append(ll['edited_img'])
+                self.seeds.append(['in_house', [cnt]])
+                cnt += 1
+
     def __len__(self) -> int:
         return len(self.seeds)
 
     def __getitem__(self, i: int) -> dict[str, Any]:
-        name, seeds = self.seeds[i]
-        propt_dir = Path(self.path, name)
-        seed = seeds[torch.randint(0, len(seeds), ()).item()]
-        with open(propt_dir.joinpath("prompt.json")) as fp:
-            prompt = json.load(fp)["edit"]
 
-        image_0 = Image.open(propt_dir.joinpath(f"{seed}_0.jpg"))
-        image_1 = Image.open(propt_dir.joinpath(f"{seed}_1.jpg"))
+        name, seeds = self.seeds[i]
+        if name != 'in_house':
+            propt_dir = Path(self.path_official, name)
+            seed = seeds[torch.randint(0, len(seeds), ()).item()]
+            with open(propt_dir.joinpath("prompt.json")) as fp:
+                prompt = json.load(fp)["edit"]
+            image_0 = Image.open(propt_dir.joinpath(f"{seed}_0.jpg"))
+            image_1 = Image.open(propt_dir.joinpath(f"{seed}_1.jpg"))
+        else:
+            j = seeds[0]
+            image_0 = Image.open(self.source_imgs[j])
+            image_1 = Image.open(self.edited_imgs[j])
+            prompt = self.instructions[j]
 
         reize_res = torch.randint(self.min_resize_res, self.max_resize_res + 1, ()).item()
         image_0 = image_0.resize((reize_res, reize_res), Image.Resampling.LANCZOS)
