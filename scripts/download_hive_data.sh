@@ -5,6 +5,8 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 mkdir -p $SCRIPT_DIR/../data
 
+# Download HIVE training data
+gsutil cp -r gs://sfr-hive-data-research/data/training $SCRIPT_DIR/../data/training
 
 # Download HIVE evaluation data
 
