@@ -3,8 +3,9 @@
 
 model:
   base_learning_rate: 1.0e-04
-  target: ldm.models.diffusion.ddpm_edit.LatentDiffusion
+  target: ldm.models.diffusion.ddpm_edit_v21.LatentDiffusion
   params:
+    ckpt_path: ./checkpoints/v2-1_512-ema-pruned.ckpt
     linear_start: 0.00085
     linear_end: 0.0120
     num_timesteps_cond: 1
@@ -12,16 +13,14 @@ model:
     timesteps: 1000
     first_stage_key: edited
     cond_stage_key: edit
-    # image_size: 64
-    # image_size: 32
-    image_size: 16
+    image_size: 32
     channels: 4
     cond_stage_trainable: false   # Note: different from the one we trained before
     conditioning_key: hybrid
     monitor: val/loss_simple_ema
     scale_factor: 0.18215
     use_ema: true
-    load_ema: true
+    load_ema: false
 
     scheduler_config: # 10000 warmup steps
       target: ldm.lr_scheduler.LambdaLinearScheduler
@@ -33,7 +32,7 @@ model:
         f_min: [ 1. ]
 
     unet_config:
-      target: ldm.modules.diffusionmodules.openaimodel.UNetModel
+      target: ldm.modules.diffusionmodules.openaimodel_v21.UNetModel
       params:
         image_size: 32 # unused
         in_channels: 8
@@ -43,9 +42,11 @@ model:
         num_res_blocks: 2
         channel_mult: [ 1, 2, 4, 4 ]
         num_heads: 8
+        num_head_channels: 64 # need to fix for flash-attn
         use_spatial_transformer: True
+        use_linear_in_transformer: True
         transformer_depth: 1
-        context_dim: 768
+        context_dim: 1024
         use_checkpoint: True
         legacy: False
 
@@ -73,27 +74,52 @@ model:
           target: torch.nn.Identity
 
     cond_stage_config:
-      target: ldm.modules.encoders.modules.FrozenCLIPEmbedder
+      target: ldm.modules.encoders.modules.FrozenOpenCLIPEmbedder
+      params:
+        freeze: True
+        layer: "penultimate"
+
 
 data:
   target: main.DataModuleFromConfig
   params:
-    batch_size: 128
-    num_workers: 1
-    wrap: false
+    batch_size: 32
+    num_workers: 2
+    train:
+      target: edit_dataset.EditDataset
+      params:
+        path_instructpix2pix: ./data/training/instructpix2pix
+        path_hive_0: ./data/training
+        path_hive_1: ./data/training/part_0_blip_prompt_new
+        path_hive_2: ./data/training/part_1_blip_prompt_new
+        split: train
+        min_resize_res: 256
+        max_resize_res: 256
+        crop_res: 256
+        flip_prob: 0.5
     validation:
       target: edit_dataset.EditDataset
       params:
-        path: ./data/training/instructpix2pix
-        cache_dir:  data/
-        cache_name: data_10k
+        path_instructpix2pix: ./data/training/instructpix2pix
+        path_hive_0: ./data/training
+        path_hive_1: ./data/training/part_0_blip_prompt_new
+        path_hive_2: ./data/training/part_1_blip_prompt_new
         split: val
-        min_text_sim: 0.2
-        min_image_sim: 0.75
-        min_direction_sim: 0.2
-        max_samples_per_prompt: 1
-        min_resize_res: 512
-        max_resize_res: 512
-        crop_res: 512
-        output_as_edit: False
-        real_input: True
+        min_resize_res: 256
+        max_resize_res: 256
+        crop_res: 256
+
+lightning:
+  callbacks:
+    image_logger:
+      target: main.ImageLogger
+      params:
+        batch_frequency: 2000
+        max_images: 2
+        increase_log_steps: False
+
+  trainer:
+    max_epochs: 3000
+    benchmark: True
+    accumulate_grad_batches: 4
+    check_val_every_n_epoch: 4

@@ -21,13 +21,16 @@ from einops import rearrange
 from PIL import Image
 from torch.utils.data import Dataset
 import jsonlines
+from collections import deque
 
 
 class EditDataset(Dataset):
     def __init__(
         self,
-        path_official: str,
-        path_ours: str,
+        path_instructpix2pix: str,
+        path_hive_0: str,
+        path_hive_1: str,
+        path_hive_2: str,
         split: str = "train",
         splits: tuple[float, float, float] = (0.9, 0.05, 0.05),
         min_resize_res: int = 256,
@@ -37,49 +40,89 @@ class EditDataset(Dataset):
     ):
         assert split in ("train", "val", "test")
         assert sum(splits) == 1
-        self.path_official = path_official
-        self.path_ours = path_ours
+        self.path_instructpix2pix = path_instructpix2pix
+        self.path_hive_0 = path_hive_0
+        self.path_hive_1 = path_hive_1
+        self.path_hive_2 = path_hive_2
         self.min_resize_res = min_resize_res
         self.max_resize_res = max_resize_res
         self.crop_res = crop_res
         self.flip_prob = flip_prob
-        # load official dataset
-        with open(Path(self.path_official, "seeds.json")) as f:
-            self.seeds = json.load(f)
+        self.seeds = []
+        self.instructions = []
+        self.source_imgs = []
+        self.edited_imgs = []
+        # load instructpix2pix dataset
+        with open(Path(self.path_instructpix2pix, "seeds.json")) as f:
+            seeds = json.load(f)
         split_0, split_1 = {
             "train": (0.0, splits[0]),
             "val": (splits[0], splits[0] + splits[1]),
             "test": (splits[0] + splits[1], 1.0),
         }[split]
 
-        idx_0 = math.floor(split_0 * len(self.seeds))
-        idx_1 = math.floor(split_1 * len(self.seeds))
-        self.seeds = self.seeds[idx_0:idx_1]
+        idx_0 = math.floor(split_0 * len(seeds))
+        idx_1 = math.floor(split_1 * len(seeds))
+        seeds = seeds[idx_0:idx_1]
 
-        # load in-house dataset
-        self.instructions = []
-        self.source_imgs = []
-        self.edited_imgs = []
+        for seed in seeds:
+            seed = deque(seed)
+            seed.appendleft('')
+            seed.appendleft('instructpix2pix')
+            self.seeds.append(list(seed))
+
+
+        # load HIVE dataset first part
+
         cnt = 0
-        with jsonlines.open(Path(self.path_ours, "training_1M.jsonl")) as reader:
+        with jsonlines.open(Path(self.path_hive_0, "training_cycle.jsonl")) as reader:
             for ll in reader:
                 self.instructions.append(ll['instruction'])
                 self.source_imgs.append(ll['source_img'])
                 self.edited_imgs.append(ll['edited_img'])
-                self.seeds.append(['in_house', [cnt]])
+                self.seeds.append(['hive_0', '', '', [cnt]])
                 cnt += 1
+
+        # load HIVE dataset second part
+        with open(Path(self.path_hive_1, "seeds.json")) as f:
+            seeds = json.load(f)
+        for seed in seeds:
+            seed = deque(seed)
+            seed.appendleft('hive_1')
+            self.seeds.append(list(seed))
+        # load HIVE dataset third part
+        with open(Path(self.path_hive_2, "seeds.json")) as f:
+            seeds = json.load(f)
+        for seed in seeds:
+            seed = deque(seed)
+            seed.appendleft('hive_2')
+            self.seeds.append(list(seed))
 
     def __len__(self) -> int:
         return len(self.seeds)
 
     def __getitem__(self, i: int) -> dict[str, Any]:
 
-        name, seeds = self.seeds[i]
-        if name != 'in_house':
-            propt_dir = Path(self.path_official, name)
+        name_0, name_1, name_2, seeds = self.seeds[i]
+        if name_0 == 'instructpix2pix':
+            propt_dir = Path(self.path_instructpix2pix, name_2)
             seed = seeds[torch.randint(0, len(seeds), ()).item()]
             with open(propt_dir.joinpath("prompt.json")) as fp:
                 prompt = json.load(fp)["edit"]
+            image_0 = Image.open(propt_dir.joinpath(f"{seed}_0.jpg"))
+            image_1 = Image.open(propt_dir.joinpath(f"{seed}_1.jpg"))
+        elif name_0 == 'hive_1':
+            propt_dir = Path(self.path_hive_1, name_1, name_2)
+            seed = seeds[torch.randint(0, len(seeds), ()).item()]
+            with open(propt_dir.joinpath("prompt.json")) as fp:
+                prompt = json.load(fp)["instruction"]
+            image_0 = Image.open(propt_dir.joinpath(f"{seed}_0.jpg"))
+            image_1 = Image.open(propt_dir.joinpath(f"{seed}_1.jpg"))
+        elif name_0 == 'hive_2':
+            propt_dir = Path(self.path_hive_2, name_1, name_2)
+            seed = seeds[torch.randint(0, len(seeds), ()).item()]
+            with open(propt_dir.joinpath("prompt.json")) as fp:
+                prompt = json.load(fp)["instruction"]
             image_0 = Image.open(propt_dir.joinpath(f"{seed}_0.jpg"))
             image_1 = Image.open(propt_dir.joinpath(f"{seed}_1.jpg"))
         else:
@@ -101,51 +144,3 @@ class EditDataset(Dataset):
 
         return dict(edited=image_1, edit=dict(c_concat=image_0, c_crossattn=prompt))
 
-
-class EditDatasetEval(Dataset):
-    def __init__(
-        self,
-        path: str,
-        split: str = "train",
-        splits: tuple[float, float, float] = (0.9, 0.05, 0.05),
-        res: int = 256,
-    ):
-        assert split in ("train", "val", "test")
-        assert sum(splits) == 1
-        self.path = path
-        self.res = res
-
-        with open(Path(self.path, "seeds.json")) as f:
-            self.seeds = json.load(f)
-
-        split_0, split_1 = {
-            "train": (0.0, splits[0]),
-            "val": (splits[0], splits[0] + splits[1]),
-            "test": (splits[0] + splits[1], 1.0),
-        }[split]
-
-        idx_0 = math.floor(split_0 * len(self.seeds))
-        idx_1 = math.floor(split_1 * len(self.seeds))
-        self.seeds = self.seeds[idx_0:idx_1]
-
-    def __len__(self) -> int:
-        return len(self.seeds)
-
-    def __getitem__(self, i: int) -> dict[str, Any]:
-        name, seeds = self.seeds[i]
-        propt_dir = Path(self.path, name)
-        seed = seeds[torch.randint(0, len(seeds), ()).item()]
-        with open(propt_dir.joinpath("prompt.json")) as fp:
-            prompt = json.load(fp)
-            edit = prompt["edit"]
-            input_prompt = prompt["input"]
-            output_prompt = prompt["output"]
-
-        image_0 = Image.open(propt_dir.joinpath(f"{seed}_0.jpg"))
-
-        reize_res = torch.randint(self.res, self.res + 1, ()).item()
-        image_0 = image_0.resize((reize_res, reize_res), Image.Resampling.LANCZOS)
-
-        image_0 = rearrange(2 * torch.tensor(np.array(image_0)).float() / 255 - 1, "h w c -> c h w")
-
-        return dict(image_0=image_0, input_prompt=input_prompt, edit=edit, output_prompt=output_prompt)

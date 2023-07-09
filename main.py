@@ -111,7 +111,7 @@ def get_parser(**parser_kwargs):
         "-s",
         "--seed",
         type=int,
-        default=23,
+        default=100,
         help="seed for seed_everything",
     )
     parser.add_argument(
@@ -125,7 +125,7 @@ def get_parser(**parser_kwargs):
         "-l",
         "--logdir",
         type=str,
-        default="/export/laion-aesthetics-v2/instruct_pix2pix/logs",
+        default="./logs",
         help="directory for logging dat shit",
     )
     parser.add_argument(
