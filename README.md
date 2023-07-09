@@ -13,7 +13,8 @@ arXiv 2023
 This is a PyTorch implementation of [HIVE: Harnessing Human Feedback for Instructional Visual Editing](https://arxiv.org/pdf/2303.09618.pdf). The major part of the code follows [InstructPix2Pix](https://github.com/timothybrooks/instruct-pix2pix). In this repo, we have implemented both [stable diffusion v1.5-base](https://huggingface.co/runwayml/stable-diffusion-v1-5) and [stable diffusion v2.1-base](https://huggingface.co/stabilityai/stable-diffusion-2-1-base) as the backbone.
 
 
-
+## Updates
+* **07/08/23**: ***Training code and training data is public.***:blush:
 
 ## Usage
 
@@ -30,13 +31,20 @@ To fine-tune a stable diffusion model, you need to obtain the pre-trained stable
 
 
 ### Data
-We suggest to install Gcloud CLI following [Gcloud download](https://cloud.google.com/sdk/docs/install). Then run
+We suggest to install Gcloud CLI following [Gcloud download](https://cloud.google.com/sdk/docs/install). To obtain both training and evaluation data, run
 ```
 bash scripts/download_hive_data.sh
 ```
 
 An alternative method is to directly download the data through [Evaluation data](https://storage.cloud.google.com/sfr-hive-data-research/data/evaluation.zip) and [Evaluation instructions](https://storage.cloud.google.com/sfr-hive-data-research/data/test.jsonl).
 
+
+### Step-1 Training
+For SD v2.1, we run
+
+```
+python main.py --name step1 --base configs/train_v21_base.yaml --train --gpus 0,1,2,3,4,5,6,7
+```
 
 ### Inference
 Samples can be obtained by running the command. 
