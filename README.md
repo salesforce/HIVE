@@ -15,6 +15,7 @@ This is a PyTorch implementation of [HIVE: Harnessing Human Feedback for Instruc
 
 ## Updates
 * **07/08/23**: ***Training code and training data is public.***:blush:
+* **03/26/24**: ***HIVE will appear in CVPR, 2024.***:blush:
 
 ## Usage
 
