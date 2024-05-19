@@ -4,6 +4,8 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 mkdir -p $SCRIPT_DIR/../checkpoints
 
+#TODO: we can download the checkpoints with gdown tool, sometimes it is hard to use the gcloud tool
+
 pip install gdown
 pip install --upgrade gdown
 
